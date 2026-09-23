@@ -1,5 +1,15 @@
 const canvas = document.getElementById("canvas");
 const gl = canvas.getContext("webgl2");
+const keys = new Set();
+
+document.addEventListener('keydown', (event) => {
+    if (event.key.startsWith("Arrow") || ['w', 'a', 's', 'd'].includes(event.key)) event.preventDefault();
+    keys.add(event.key);
+});
+
+document.addEventListener("keyup", (event) => {
+    keys.delete(event.key);
+});
 
 if (!gl) {
     throw new Error("WebGL 2 não é suportado.");
@@ -152,7 +162,7 @@ gl.enable(
 // ==================================================
 
 const scene =
-    new Scene(gl,program);
+    new Scene(gl,program, keys);
 
 
 // ==================================================
