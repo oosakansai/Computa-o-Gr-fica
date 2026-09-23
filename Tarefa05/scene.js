@@ -13,6 +13,9 @@ class Scene {
         this.x = 0;
         this.y = 0;
 
+        //espelhamento
+        this.direction = 1;
+
         // Figura que será exibida
         this.helicopterBody = new HelicopterBody();
 
@@ -38,19 +41,42 @@ class Scene {
         }
         else if(this.keys.has('ArrowLeft') || this.keys.has('a')){
             this.x -= this.speed;
+            this.direction = 1;
         }
         else if(this.keys.has('ArrowRight') || this.keys.has('d')){
             this.x += this.speed;
+            this.direction = -1;
         }
 
-        this.theta += 0.8;
+        this.theta += 0.01;
         this.helicopterBody.update(m4.translate(m4.identity(), this.x, this.y, 0.0));
         this.helicopterTopShaft.update(m4.translate(m4.identity(), this.x, this.y, 0.0));
-        this.helicopterTail.update(m4.translate(m4.identity(), this.x, this.y, 0.0));
-        this.helicopterPropellers.update(m4.translate(m4.yRotate(m4.translate(m4.identity(), 0.0, -0.325, 0.0), this.theta), 0.0+this.x, 0.325+this.y, 0.0));
-        this.helicopterTailPropeller.update(m4.translate(m4.zRotate(m4.translate(m4.identity(), -0.7, 0.0, 0.0), this.theta), 0.7+this.x, 0.0+this.y, 0.0));
 
-
+        // operacao de dentro para fora
+        this.helicopterPropellers.update(
+            m4.translate(
+                m4.yRotate(
+                    m4.translate(m4.identity(), 0.0, -0.325, 0.0), 
+                this.direction*this.theta), 
+            0.0+this.x, 0.325+this.y, 0.0));
+        
+        this.helicopterTail.update(
+            m4.translate(
+                m4.scale(m4.identity(), this.direction,1,1), 
+            this.x, this.y, 0.0));
+        
+        this.helicopterTailPropeller.update(
+            m4.translate(
+                m4.scale(
+                    m4.zRotate(
+                        m4.translate(m4.identity(), -0.7, 0.0, 0.0), 
+                    this.direction*this.theta),
+                1, 1, this.direction),
+            this.direction*0.7+this.x, 0.0+this.y, 0.0));
+        
+        // esquerda e direita: o corpo e shaft permanecem inalterados.
+        // precisa espelhar hélice pequena e o tail
+        // a hélice pequena é o unico componente nao centralizado em z.
     }
 
     draw() {
